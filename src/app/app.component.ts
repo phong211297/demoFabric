@@ -64,15 +64,19 @@ export class AppComponent implements AfterViewInit {
   }
 
   public exportJSON(): void {
-    // To object data
-    fabric.Image.prototype.toObject = (function (toObject: any) {
+    fabric.Image.prototype.toObject = (function (toObject) {
       return function () {
         return fabric.util.object.extend(toObject.call(this), {
           src: this.toDataURL(),
+          width: this.width * this.scaleX,
+          height: this.height * this.scaleY,
+          scaleX: 1,
+          scaleY: 1,
         });
       };
     })(fabric.Image.prototype.toObject);
 
+    // To object data
     const json_data = JSON.stringify(this.canvas.toDatalessJSON());
     console.log(json_data);
 
@@ -82,28 +86,12 @@ export class AppComponent implements AfterViewInit {
   public importJSON(): void {
     const json_data = localStorage.getItem('canvasSection');
     console.log(json_data);
-    if (json_data) {
-      this.canvas.loadFromJSON(JSON.parse(json_data), () => {
-        this.canvas.renderAll();
+    this.canvas.clear();
 
-        this.canvas.forEachObject((obj: any) => {
-          console.log(obj);
-          if (obj.name === 'recta') {
-            obj.set({
-              left: 100,
-              top: 200,
-              height: 700,
-              width: 700,
-              scaleX: 0.35,
-              scaleY: 0.35,
-              lockScalingY: 0.35,
-            });
-          }
-
-          this.canvas.add(obj);
-        });
-      });
-    }
+    this.canvas.loadFromJSON(
+      json_data,
+      this.canvas.renderAll.bind(this.canvas)
+    );
   }
   //#endregion
 }
