@@ -41,6 +41,17 @@ export class AppComponent implements AfterViewInit {
     window.addEventListener('paste', (e: any) => {
       this.pasteImage(e);
     });
+
+    this.canvas.on('mouse:wheel', (opt: any) => {
+      var delta = opt.e.deltaY;
+      var zoom = this.canvas.getZoom();
+      zoom *= 0.999 ** delta;
+      if (zoom > 20) zoom = 20;
+      if (zoom < 0.01) zoom = 0.01;
+      this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+      opt.e.preventDefault();
+      opt.e.stopPropagation();
+    });
   }
 
   public pasteImage(e: any): void {
@@ -57,9 +68,15 @@ export class AppComponent implements AfterViewInit {
       const img = new Image();
       img.src = objUrl.createObjectURL(imageData);
 
-      fabric.Image.fromURL(img.src, (img) => {
-        this.canvas.add(img);
-      });
+      fabric.Image.fromURL(
+        img.src,
+        (img) => {
+          this.canvas.add(img);
+        },
+        {
+          lockRotation: true,
+        }
+      );
     }
   }
 
@@ -72,12 +89,14 @@ export class AppComponent implements AfterViewInit {
           height: this.height * this.scaleY,
           scaleX: 1,
           scaleY: 1,
+          hasRotatingPoint: false,
+          lockRotation: true,
         });
       };
     })(fabric.Image.prototype.toObject);
 
     // To object data
-    const json_data = JSON.stringify(this.canvas.toDatalessJSON());
+    const json_data = JSON.stringify(this.canvas.toJSON());
     console.log(json_data);
 
     localStorage.setItem('canvasSection', json_data);
