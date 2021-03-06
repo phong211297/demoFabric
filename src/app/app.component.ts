@@ -46,8 +46,8 @@ export class AppComponent implements AfterViewInit {
       var delta = opt.e.deltaY;
       var zoom = this.canvas.getZoom();
       zoom *= 0.999 ** delta;
-      if (zoom > 20) zoom = 20;
-      if (zoom < 0.01) zoom = 0.01;
+      if (zoom > 10) zoom = 10;
+      if (zoom < 0.1) zoom = 0.1;
       this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
       opt.e.preventDefault();
       opt.e.stopPropagation();
