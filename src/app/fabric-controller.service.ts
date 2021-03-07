@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { fabric } from 'fabric';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class FabricControllerService {
   //#region Properties
 
@@ -33,9 +35,8 @@ export class FabricControllerService {
     shouldSupportParsing: boolean = true,
     shouldSupportZoom: boolean = true
   ): void {
-
     // Create workspace
-    this.canvasWorkspace(new fabric.Canvas(id));
+    this.canvasWorkspace = new fabric.Canvas(id);
 
     // Parsing event
     if (shouldSupportParsing) {
@@ -54,7 +55,10 @@ export class FabricControllerService {
         zoom *= 0.999 ** delta;
         if (zoom > 10) zoom = 10;
         if (zoom < 0.1) zoom = 0.1;
-        this.canvasWorkspace.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+        this.canvasWorkspace.zoomToPoint(
+          { x: opt.e.offsetX, y: opt.e.offsetY },
+          zoom
+        );
         opt.e.preventDefault();
         opt.e.stopPropagation();
       });
@@ -90,10 +94,10 @@ export class FabricControllerService {
 
   // Export json feature
   public exportJSON(): void {
-    fabric.Image.prototype.toObject = (function (toObject: any): any {
-      return this.createImageObject();
-    })(fabric.Image.prototype.toObject);
-
+    fabric.Image.prototype.toObject = this.createImageObject.call(
+      fabric.Image.prototype,
+      fabric.Image.prototype.toObject
+    );
     // To object data
     const json_data = JSON.stringify(this.canvasWorkspace.toJSON());
 
@@ -101,17 +105,21 @@ export class FabricControllerService {
   }
 
   // Create image object
-  public createImageObject(toObject: any):void {
-    return fabric.util.object.extend(toObject.call(this), {
-      src: this.toDataURL(),
-      width: this.width * this.scaleX,
-      height: this.height * this.scaleY,
-      scaleX: 1,
-      scaleY: 1,
-      hasRotatingPoint: false,
-      lockRotation: true,
-    });
+  public createImageObject(toObject: any): any {
+    return function () {
+      const self = this;
+      return fabric.util.object.extend(toObject.call(self), {
+        src: self.toDataURL(),
+        width: self.width * self.scaleX,
+        height: self.height * self.scaleY,
+        scaleX: 1,
+        scaleY: 1,
+        hasRotatingPoint: false,
+        lockRotation: true,
+      });
+    };
   }
+
   // Import json feature
   public importJSON(): void {
     const json_data = localStorage.getItem('canvasSection');
