@@ -12,9 +12,10 @@ import { StoreModule } from '@ngrx/store';
 import { AuthModule } from './auth/auth.module';
 import { LoginComponent } from './login/login.component';
 import { routerReducer, StoreRouterConnectingModule } from '@ngrx/router-store';
+import { BaseComponent } from './base/base.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent],
+  declarations: [AppComponent, LoginComponent, BaseComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

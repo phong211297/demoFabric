@@ -1,3 +1,4 @@
+import { BaseComponent } from './base/base.component';
 import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component } from '@angular/core';
 import { fabric } from 'fabric';
@@ -7,7 +8,7 @@ import { fabric } from 'fabric';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent extends BaseComponent implements AfterViewInit  {
   //#region Properties
 
   // Page title
@@ -19,7 +20,9 @@ export class AppComponent implements AfterViewInit {
 
   //#region Constructor
 
-  public constructor(protected httpClient: HttpClient) {}
+  public constructor(protected httpClient: HttpClient) {
+    super();
+  }
 
   //#endregion
 
@@ -27,24 +30,14 @@ export class AppComponent implements AfterViewInit {
 
   public ngAfterViewInit() {
     this.canvas = new fabric.Canvas('canvas');
-    const rect = new fabric.Rect({
-      left: 100,
-      top: 100,
-      fill: 'red',
-      width: 20,
-      height: 20,
-    });
-
-    // "add" rectangle onto canvas
-    this.canvas.add(rect);
 
     window.addEventListener('paste', (e: any) => {
       this.pasteImage(e);
     });
 
     this.canvas.on('mouse:wheel', (opt: any) => {
-      var delta = opt.e.deltaY;
-      var zoom = this.canvas.getZoom();
+      const delta = opt.e.deltaY;
+      let zoom = this.canvas.getZoom();
       zoom *= 0.999 ** delta;
       if (zoom > 10) zoom = 10;
       if (zoom < 0.1) zoom = 0.1;
