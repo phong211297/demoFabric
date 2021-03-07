@@ -107,11 +107,10 @@ export class FabricControllerService {
   // Create image object
   public createImageObject(toObject: any): any {
     return function () {
-      const self = this;
-      return fabric.util.object.extend(toObject.call(self), {
-        src: self.toDataURL(),
-        width: self.width * self.scaleX,
-        height: self.height * self.scaleY,
+      return fabric.util.object.extend(toObject.call(this), {
+        src: this.toDataURL(),
+        width: this.width * this.scaleX,
+        height: this.height * this.scaleY,
         scaleX: 1,
         scaleY: 1,
         hasRotatingPoint: false,
